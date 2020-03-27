@@ -1,0 +1,121 @@
+CSCI 104 HW5: Heaps
+Name: Nichil Stewart
+Email Address: nichilst@usc.edu
+
+1. 
+
+Order of Alphabet:
+A-B-C-D-E-F-G-H-I-J-K-L-M-N-O-P-Q-R-S-T-U-V-W-X-Y-Z
+
+CHEMISTRY written as a tree:
+
+             C
+          /     \
+      H            E
+    /   \        /   \
+   M     I      S     T
+ /   \
+R     Y
+
+Where:
+-C has children H and E
+-H has children M and I
+-E has children S and T
+-M has children R and Y
+
+
+2.
+
+In order for a minHeap to be valid, each non-leaf node in the tree must have a
+lesser value than both of its children. 
+
+Node with value C has lesser alphabetic value than children with value H and E.
+Node with value H has lesser alphabetic value than children with value M and I.
+Node with value E has lesser alphabetic value than children with value S and T.
+Node with value M has lesser alphabetic value than children with value R and Y.
+
+Thus the tree for CHEMISTRY is a valid minHeap.
+
+
+3. 
+
+Resulting tree after add(D) call:
+
+Insert node D at last position.
+
+            C
+         /     \
+      H          E
+    /   \      /   \
+  M       I   S     T
+ / \     /
+R   Y   D
+
+As D has lesser value than I, swap the nodes.
+
+            C
+         /     \
+      H          E
+    /   \      /   \
+  M       D   S     T
+ / \     /
+R   Y   I
+
+As D has lesser value than H, swap the nodes.
+
+            C
+         /     \
+      D          E
+    /   \      /   \
+  M       H   S     T
+ / \     /
+R   Y   I
+
+MinHeap tree is now balanced.
+
+
+4. 
+
+Resulting tree after remove() call:
+
+Swap top node with last node in the heap. 
+
+            I
+         /     \
+      D          E
+    /   \      /   \
+  M       H   S     T
+ / \     /
+R   Y   C
+
+Remove previous top node from the last position.
+
+            I
+         /     \
+      D          E
+    /   \      /   \
+  M       H   S     T
+ / \    
+R   Y   
+
+Swap new head node with its smallest child node.
+
+            D
+         /     \
+      I          E
+    /   \      /   \
+  M       H   S     T
+ / \     
+R   Y   
+
+Swap I node with its smallest child node.
+
+            D
+         /     \
+      H          E
+    /   \      /   \
+  M       I   S     T
+ / \    
+R   Y  
+
+MinHeap tree is now balanced.

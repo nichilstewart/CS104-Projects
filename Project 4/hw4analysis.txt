@@ -1,0 +1,117 @@
+CSCI 104 HW4: Basic Interpreter Runtime Analysis
+Name: Nichil Stewart
+Email Address: nichilst@usc.edu
+
+1)
+
+My high-level approach is to create a map that stores all command linenumbers
+as keys mapped to that command's position in a vector array of all commands.
+My vector array and stack are defined on line 37 and 56 (in interpreter.h).
+
+You can see in lines 77, 97, 115, 134, 152, 164, 176 (in interpreter.cpp) that
+I am pushing each of my command variables in a vector array that is organized
+by parse order. You can then see in lines 80, 100, 118, 155, 167, 179 that I am
+inserting that command's parse order (size of vector -1) into a map by that 
+command's linenumber (the key). As parse order corresponds to vector position,
+it is possible to find the position of a command in the vector array in 
+logarithmic time (theta(log(n)), where n is the number of commands in the 
+array) if you have the target linenumber. 
+
+When figuring out which line a GOTO/IF/GOSUB jumps to, my program on lines 595,
+619, 646 first access the target linenumber via a getter function in constant
+(theta(1)) time. On lines 598, 614, 649 my program checks if that linenumber 
+exists within the linenumber map in logarithmic time (theta(log(n)) as stated
+above. If the line doesn't exist the program throws an error. If it does exist,
+the program finds the target command's array position on lines 607, 633, 658 in
+logarithmic time (theta(log2(n)). It then updates the class variable 'newline'
+to that position and sets class variable 'skip_line' to true to let the program
+know if will need to skip lines next. Both of these operations are in constant
+(theta(1)) time. Accessing the command in the vector array is also done in 
+constant (theta(1)) time.
+
+Thus the running time to find what line a GOTO/IF/GOSUB command jumps to runs
+in (2*log2(n)+4) time (where n is the number of total commands), which is equal
+to (theta(log(n)) runtime overall. 
+
+2)
+
+My high-level approach is to store all GOSUB linenumbers in a stack (line 62 in
+interpreter.h) so they can be accessed in order of recency by a RETURN command.
+
+On line 664 (in interpreter.cpp) the GOSUB command pushes the vector array 
+position of the next command into the GOSUB stack (for context, this action
+is not calculated into runtime). On line 671, the RETURN command first checks
+if the stack is empty in constant (theta(1)) time. If it is, it returns an
+error message. If not, on line 676 (in interpreter.cpp) RETURN accesses the top
+element in the stack in constant (theta(1)) time with the top() command, which
+sets the class variable 'newline' to the position of the next command in the
+array. 
+
+On line 679 the program must then use the function pop() to remove the top
+value in constant (theta(1)) time so it can handle future RETURN commands.
+On line 681 it must set the class variable 'skip_line' to true so the program
+knows it will skip back to the GOSUB line. This  takes constant (theta(1))    
+time. Finally, accessing the command in the vector array is also done in 
+constant (theta(1)) time (lines 550, 552, 554, etc.). 
+
+Thus the running time to find the command RETURN jumps to runs in (1+1+1+1)
+time (considering all necessary steps to access command). Thus, time (4) is
+equal to constant (theta(1)) runtime overall.
+
+3)
+
+My high-level approach is to use a map to store all the integer variable names
+(as keys) that map to int* pointers of each variable's value (as values). Thus
+all variables with the same name will have access to the same value pointer and
+will be updated simulataneously. 
+
+On line 42 (in arithmetic.cpp) I define a public getValue() function that 
+returns the value of its private variable 'int* value'. getValue() is a 
+recursive function and for a single variable object it will run in constant
+(theta(1)) time. I have similarly defined a getInt() function on line 55
+(command.cpp) that allows public access from the interpreter and will call
+getValue() in constant time, thus the accessing a variable's value is in 
+constant (theta(1)) time.
+
+On line 568 (in interpreter.cpp) the LET command uses a recursive getName()
+function that runs in constant (theta(1)) time to get the variable name. Assume
+you have already the target value (which can be found in constant time). On
+line 586 the program creates an int* pointer and copies the location of the
+variable value. On line 588, the value of that pointer is set to the target
+value. Both operations will require searching and sorting the map, which both
+run in logarithmic (theta(log2(n))) time. 
+
+Thus the running time to find the value of a variable runs in (1+1) time, equal
+to constant (theta(1)) runtime overall. The running time to change a variable
+runs in (2*log2(n)) time (where n is the amount of variables in the map), and
+thus has a logarithmic (theta(log(n))) runtime overall. 
+
+While it might be possible to write values to a variable in constant time by
+directly accessing its int* value pointer, I was unable to do so without
+overhauling my inheritance relationships or variable privacy settings.
+
+4)
+
+My high-level approach is to use a map to store all the array variable names
+(as keys) that map to map* pointers (as values). These map pointers link array
+indicies to array index values, so all array variables of the same name will
+have their map values updated simultaneously. I am essentially using the map as
+a pseudo-array that has both negative and positive indicies.
+
+On line 67 (in arithmetic.cpp) I define a public getValue() function for array
+variables. On line 71, the function will check if the 'value_array' map
+contains the specified index value. This operation runs in logarithmic
+(theta(log(n))) time (where n is the number of other sets in the map). If it is
+missing, the function will simply return 0 for an undefined variable. If it
+does contain that index, on line 72 it will search its 'value_array' map with
+its index value and will return the corresponding array value. This operation
+also runs in logarithmic (theta(log(n))) time. Assuming you have already
+calculated the index value, I am not factoring it into the overall runtime. I
+have similarly defined a getInt() function on line 55 (in command.cpp) that
+allows public access from the interpreter and will call getValue() in constant
+time. It will then access an array's value at a given index in (2*log2(n)+1)
+time.
+
+The running time to find the value of a array runs in (2*log2(n)+1) time, equal
+to logarithmic (theta(log(n))) runtime overall (where n is the number of
+defined index values in for the specified array name).

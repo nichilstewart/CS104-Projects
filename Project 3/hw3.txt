@@ -1,0 +1,275 @@
+CSCI 104 HW3: Problems 1,2,3 Answers 
+Name: Nichil Stewart
+Email Address: nichilst@usc.edu
+
+
+Problem 1: List, Set, Map, Stack, and Queue
+
+a) "Data type that stores the histories of all of The Rani's subjects, ordered
+by their number in the initial subject pool (an integer from 0 to n-1)."
+
+List that stores the subject's histories as either 1) List of arrays containing
+all the subject pools they visited in order, or 2) List of strings containing 
+each subject pool visited in order seperated by whitespace. These n histories 
+would be indexed from 0 to n-1 in the list, based on their number in the 
+initial subject pool. Neither maps or sets can use chronological ordering, so
+they are not useful. Stacks and queues are both chronological, but there is no
+stated need to access either the first or last element. Further, they cannot 
+access middle elements without deleting the prevoius/next elements, which is 
+undesirable for storing long-term data. 
+
+Note: The Rani's subjects were orders from 0 to n-1, not 1 to n.
+
+b) "Data type that stores all students that earned A grade in CSCI 103."
+
+Set that stores all the students that earned an A (as objects containing their
+name and information). As we are only storing students that got an A grade, 
+there is no need to include a map that includes other possible grades as keys.
+Order is not useful so neither list, stack, or queue is important. 
+
+c) "Data type that stores all of the students in CSCI 104: given a student 
+name, it brings up the student with that name."
+
+Map that stores values of students (as objects containing their name and 
+information) mapped to keys of their names (as strings containing their name).
+A map best links object values to keys, meaning you would only have to search 
+the student's name (key) to access their information (value). No other data
+type can do this, this it is the best answer.
+
+d) "Data type that stores all of the students that were in CSCI 103 in Spring
+2019. Given a grade, it brings up all of the students that earned that grade."
+
+Map that stores values of students (as objects containing their name and
+information) mapped to keys of grades (as strings containing various grades).
+A map best links multiple values to a single key, which no other data type is
+capable of. I chose to make the key of type string (vs. a single char) as I
+wasn't sure if the map would consider A-, B+, "Grade Incomplete", etc. as other
+key values.
+
+
+Problem 2: Linked List Reversal
+
+Initial linked list:
+[1]->[2]->[3]->[4]->[5]
+
+FuncA(): When the head pointer is passed into funcA() as 'in', another node
+'out' is set to the same location. A while loop is then used to locate the
+last linked list node [5], and then 'out' is then pointing to the location
+of [5]. FuncA() then calls FuncB(in) passing node 'in' still pointing to [1],
+and attempts to set the next pointer of the returned node to NULL. FuncB() is
+addressed below:
+
+FuncB(): As 'in'->next points to [2] (not NULL), it triggers the if-statement
+and then sets up a recursive call to itself. Note that as 'in' initially points
+to [1], [1]->next will point to [2], and so on. Here is a list of recursion
+calls for 'funcB(in->next)->next = in':
+
+1. funcB([2])->next = [1];
+2. funcB([3])->next = [2];
+3. funcB([4])->next = [3];
+4. funcB([5])->next = [4];
+
+When funcB([5]) is called, it will not trigger the if-statement (as it points
+to NULL) and will instead return itself. In doing so, the function will stop
+recursing and instead return all of its calls in reverse order as follows:
+
+4. funcB([5])->next = [4];
+3. funcB([4])->next = [3];
+2. funcB([3])->next = [2];
+1. funcB([2])->next = [1];
+
+Infinite linked list:
+[5]->[4]->[3]->[2]->[1]->[2]->[1]->[2]... (Note: List is currently infinite.)
+
+The function returns the pointer to 'in' (now pointed at [1]) back to funcA().
+The function then sets [1]->next = NULL, preventing [1] and [2] from both
+pointing to each other infinitely, thus ending the list at [1]. FuncA() then
+returns the pointer 'out', which is pointing to [5]. The returned linked list
+is reversed as such:
+
+Final linked list:
+[5]->[4]->[3]->[2]->[1]
+
+
+Problem 3: Run Time Analysis
+
+a)	Code is θ(n^2) runtime. 
+
+1. for (int i=0; i < n; i++)
+2. if (A[i] == 0) 
+3. for (int j=0; j <= i; j++)
+4. if (A[i] == 0) { 	
+5. for (int k=0; k <= j; k++)
+6. A[i] = 1;
+
+Line 6 will always run in θ(1). Note that A[i] == 1 for future iterations.
+Lines 4 and 5 will either run θ(j) or θ(1) times depending if A[i] == 0.
+Since it is always true for first loop iteration, it is θ(1). 
+Lines 2 and 3 will either run θ(i) or θ(1) times depending if A[i] == 0.
+Since it is always true, is it θ(i).
+Line 1 will run θ(n^2) times. 
+
+For n=1, note that all lines of code will execute and value of A[0] goes from
+0 to 1.
+
+For n>1 and i>0, line 4 will only evaluate to true if A[i] has not yet been set
+to 1. This will only be the case when j=0, as the code will run until line 6
+where A[i] = 1. For future iterations when j>0, line 4 evaluates to false as
+A[i] has already been set to 1. Thus lines 5 and 6 are only executed once per
+iteration of i , and thus operate in constant θ(1) time.
+
+Line 2 will always evaluate to true as the value i has just been incremented
+and A[i] has not yet been modified. Thus line 3 operates in θ(i) time. 
+
+Line 1 will run n times, and can be expressed as follows:
+
+Σ[i=0 to n-1]Σ[j=0 to i](1) = Σ[i=0 to n-1](i) = θ(n^2) by definition of a
+arithmetic series. 
+
+
+b)	Code is θ(n) runtime. 
+
+1. for (int i = 1; i < n; i *= 2) {
+2. func(i);
+3. void func(int x) {
+4. if (x <= 1) return;
+5. func(x-1);
+
+Line 5 is calculated via recurrence relation (see work below).
+Line 4 has base case: x = 1.
+Line 3 is function call.
+Line 2 will call function.
+Line 1 runs θ(log(n)) times. Note values of i increase at 2^i
+
+Recurrence relation of func(): 
+
+Base case: T(1) = θ(1)
+Recursive case: T(x) = T(x-1) + θ(1)
+Thus: T(x) = θ(x)
+
+As values of x = 2^i, thus T(x) = T(2^i)
+
+As values of 2^i < n, i < log2(n). 
+Note the last value of i = log2(n-1). 
+
+Thus the function can be expressed as follows:
+1. Σ[i=0 to log2(n-1)](2^i) =
+2. 2^(log2(n-1)) =
+3. (n-1) =
+4. θ(n), which is final answer.
+
+
+c)	Code is θ(n^3)
+
+1. Node *head = new Node;
+2. Node *curr = head;
+3. head->data = 0;
+4. head->next = nullptr;
+
+5. for (int i = 1; i < n; i++) {
+6. curr->next = new Node;
+7. curr = curr->next;
+8. curr->data = i;
+9. curr->next = nullptr;
+
+10. for (int i = 1; i <= n; i++) {
+11. curr = head;
+12. while (curr != nullptr) {
+13. if (curr->data % i == 0) {
+14. for (int j = 0; j < n; j++) {
+16. curr = curr->next;
+
+Line 16 runs in constant time θ(1).
+Line 15 runs in constant time θ(1).
+Line 13, 14 are either θ(n) or θ(1). Sometimes true for all n values, so θ(n).
+Line 12 is θ(n^2), as it evaluates for each linked node.
+Line 11 runs in constant time θ(1).
+Line 10 runs in  θ(n^3) as it loops over line 12. 
+Lines 6-9 run in constant time θ(1).
+Line 5 runs in from i=1 to n-1, and n-1 = θ(n).
+Lines 1-4 run in constant time θ(1).
+
+This code is using a linked list structure to compare two sets of numbers using
+the modulo operator.   
+
+Linked list values:    [0][1][2]...[n-1]
+Loop iteration values: [1][2][3]...[n]
+
+The first chunk of code creates the first node in constant time, thus θ(1).
+
+The second chunk of code creates the other n-1 nodes in the list. It has a loop
+from 1 to n and its contents are in constant time, thus the chunk is θ(n).
+
+For the third chunk, a while loop is used to cycle through all the linked list
+nodes, comparing each of their values against the value of i set by the outer
+loop. If a node value divides by i, then the code performs an arbitrary action
+n times. If true the complexity of the action is θ(n), if false is it θ(1).
+For each possible n input, there will be at least 1 (if not multiple) times the
+if-statement evaluates true (as values of n increase, the success rate will
+approach ~50%.) Since it will not always evaluate false, we must assume the
+if-statement and for-loop are of θ(n). The while loop evaluates for all n
+nodes, so it has time complexity θ(n^2). This is then repeated n times by
+increnting values of i for all possible comparisons by the outer loop, bringing
+the final time complexity of this chunk of code to θ(n^3).
+
+It can be expressed via summations as such:
+Σ[i=1 to n]Σ[node-1 to node-n]Σ[j=0 to n-1](1) = θ(n^3)
+
+1st chunk: θ(1)
+2nd chunk: θ(n)
+3rd chunk: θ(n^3)
+Total: (1)+(n)+(n^3) = θ(n^3), which is final answer
+
+
+d)	Code is in θ(n)
+
+1. double *a = new double [3];
+2. int size = 3;
+
+3. for (int i = 0; i < n; i ++) {
+4. if (i == size) {  
+5. int newsize = 3 * size;
+6. double *b = new double [newsize];
+
+7. for (int j = 0; j < size; j++) b[j] = a[j];
+
+8. delete [] a;				
+9. a = b;
+10. size = newsize;
+
+11. a[i] = sqrt(i);
+
+Line 11 runs in constant time θ(1), executed for every value of i.
+Lines 8-10 run in constant time θ(1), execute when i == size.
+Line 7 runs in θ(i) time, as size == i.
+Lines 5-6 run in constant time θ(1).
+Line 4 runs in θ(log3(n)), when size = 3, 9, 27...largest 3^x < n.
+Line 3 runs in θ(n) time. 
+Lines 1-2 run in in constant time θ(1).
+
+The code chunk writes a total of n values into an array. Each time the array is
+full, the program creates a new array 3 times larger, copies the values from
+the old array into the new array, then deleted the old array. The outer loop
+runs a total of n times, each time setting a value in the array equal to the
+sqrt() value of i.
+
+The inner loop has time complexity of θ(i), where i is some value in the outer
+loop that is equal to size. Each time the inner loop runs, it triples the value
+of size. This makees the inner loop run only when i is equal to a value in the
+geometric sequence of 3^x less than n, which is a total of log3(n) times. To
+solve for it's summation, set to bounds from i=0 to log3(n) for each time i =
+size, while adjust series to 3^i for all necessary values to copy to the new
+array. It can be calculated as such: 
+
+1. Σ[i=0 to log3(n)-1](3^(i+1)) =
+2. Σ[i=1 to log3(n)](3^(i)) =
+3. (3^(log3(n)+1)-1)/(3-1) = 
+4. (3/2)*n
+
+Note that step 3 uses the definition of a geometric series ((c^(n+1)-1)/(c-1))
+to give us our complexity.
+
+The outer loop will also write a value into the array for each iteration of i,
+so it's time complexity is simply θ(n).
+
+Total complexity: (3/2)n + n = (5/2)n = θ(n), which is final answer.
